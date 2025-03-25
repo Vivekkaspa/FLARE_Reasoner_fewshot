@@ -320,6 +320,66 @@ class GNNEmbeddingmix(nn.Module):
         return  node_rep, edge_rep
 
 
+class COMPASSWeightModel(nn.Module):
+    def __init__(self, dataset, parameter):
+        super(COMPASSWeightModel, self).__init__()
+      
+        # Additional MLPs for attention/weighting
+        self.edge_attention_mlp = nn.Sequential(
+            nn.Linear(self.hidden_dim, self.hidden_dim),
+            nn.ReLU(),
+            nn.Linear(self.hidden_dim, 1)
+        )
+        self.graph_weight_mlp = nn.Sequential(
+            nn.Linear(self.prototype_dim, self.hidden_dim),
+            nn.ReLU(),
+            nn.Linear(self.hidden_dim, 1)
+        )
+
+    def forward(self, graph):
+        # Initialization (same as SAFER)
+        b_e = torch.cat([graph.edge_features, g_all.expand(graph.num_edges, -1)], dim=1)
+        
+        # Iterative Edge Attention (L layers)
+        for _ in range(self.niters):
+            # 1. Node Embedding with Attention
+            alpha_e = torch.sigmoid(self.edge_attention_mlp(b_e))  # [E,1]
+            alpha_e = scatter_softmax(alpha_e, graph.edge_index[1])  # Normalize per node
+            
+            b_v = scatter_add(alpha_e * b_e, graph.edge_index[1], dim=0)  # [N,d]
+            b_v = b_v / (1 + graph.node_degrees.unsqueeze(1))  # Degree normalization
+            
+            # 2. Role Augmentation
+            r_v = torch.cat([
+                b_v,
+                (graph.nodes == graph.heads).float().unsqueeze(1),
+                (graph.nodes == graph.tails).float().unsqueeze(1)
+            ], dim=1)
+            
+            # 3. Edge Update
+            sender_roles = r_v[graph.edge_index[0]]
+            receiver_roles = r_v[graph.edge_index[1]]
+            b_e = self.edge_update_mlp(torch.cat([sender_roles, receiver_roles, b_e], dim=1))
+        
+        # Graph Embedding (MaxPool + Head/Tail)
+        g_G = torch.cat([
+            global_max_pool(b_v, graph.batch),
+            b_v[graph.heads],
+            b_v[graph.tails]
+        ], dim=1)
+        
+        # Adaptive Support Graph Weighting
+        if self.training:  # Only for support graphs
+            w_k = torch.softmax(self.graph_weight_mlp(g_G), dim=0)
+            g_all = (w_k * g_G).sum(dim=0, keepdim=True)
+        else:
+            g_all = g_G.mean(dim=0, keepdim=True)
+        
+        # Final Edge Weights
+        w_e = torch.sigmoid(self.edge_weight_layer(b_e))
+        
+        return w_e, g_all
+
 class mix_model2(nn.Module):
     def __init__(self, dataset, parameter):
         super(mix_model2, self).__init__()
