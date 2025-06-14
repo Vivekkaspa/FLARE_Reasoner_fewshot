@@ -1,5 +1,13 @@
 
-# FLARE: Enhancing Few-Shot Missing Triple Prediction via Attention-Guided Subgraph Reasoning
+# FLARE: Few-shot Learning with Attention-guided Relational Subgraph Reasoner
+
+The codes are associated with the following Manuscript submitted for PReMI'2025:
+
+>**FLARE: Enhancing Few-Shot Missing Triple Prediction via Attention-Guided Subgraph Reasoning,**    
+>Vivek Kaspa, Yashwanth Arikathota, Mukesh Eppili, Hima Bindu Kommanti
+
+
+![FLARE1](https://github.com/user-attachments/assets/c2fe7b2b-91c9-40bf-a60c-289094046a6e)
 
 ## 1. Environments
 
@@ -29,7 +37,7 @@ Run
 
 ## 5. Acknowledgment
 
-Our code is based on the code of [CSR](https://github.com/snap-stanford/csr). Thanks to the authors and developers!
+Our code is based on the code of [CSR](https://github.com/snap-stanford/csr) and [SAFER](https://github.com/HaochenLiu2000/SAFER). Thanks to the authors and developers!
 
 
 
