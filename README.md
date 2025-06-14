@@ -1,11 +1,5 @@
 
-# Few-shot Knowledge Graph Relational Reasoning via Subgraph Adaptation
-
-The codes are associated with the following paper:
-
->**Few-shot Knowledge Graph Relational Reasoning via Subgraph Adaptation,**     
->Haochen Liu, Song Wang, Chen Chen, Jundong Li,     
->Annual Conference of the North American Chapter of the Association for Computational Linguistics (NAACL), 2024.
+# FLARE: Enhancing Few-Shot Missing Triple Prediction via Attention-Guided Subgraph Reasoning
 
 ## 1. Environments
 
@@ -19,7 +13,7 @@ Download [NELL](http://snap.stanford.edu/csr/NELL.zip), [FB15K-237](http://snap.
 
 ## 3. Training
 
-To train our SAFER model on dataset(NELL, FB15K-237, ConceptNet):
+To train our FLARE model on dataset(NELL, FB15K-237, ConceptNet):
 
 Run
 
@@ -27,7 +21,7 @@ Run
 
 ## 4. Evaluation
 
-To test the trained SAFER model:
+To test the trained FLARE model:
 
 Run
 
